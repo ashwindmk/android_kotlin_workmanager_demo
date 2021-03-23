@@ -2,6 +2,7 @@ package com.ashwin.android.example.workmanagerdemo
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import androidx.work.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.TimeUnit
@@ -34,14 +35,16 @@ class MainActivity : Activity() {
     }
 
     private fun enqueueRepeatingWork() {
-        val workManager: WorkManager = WorkManager.getInstance()
+        Log.w("debug-log", "enqueueRepeatingWork")
+        val workManager: WorkManager = WorkManager.getInstance(this)
 
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
         val workRequest: PeriodicWorkRequest = PeriodicWorkRequest.Builder(MyWorker::class.java, 15, TimeUnit.MINUTES)
+            .setInitialDelay(30, TimeUnit.SECONDS)
             .setConstraints(constraints)
             .build()
 
-        workManager.enqueue(workRequest)
+        workManager.enqueueUniquePeriodicWork("periodic-work-1", ExistingPeriodicWorkPolicy.REPLACE, workRequest)
     }
 }
